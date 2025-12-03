@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+        "http://checkstyle.sourceforge.net/dtds/suppressions_1_1.dtd">
+<suppressions>
+    <!-- подавляем конкретную проверку для главных Spring Boot классов  -->
+    <suppress files=".*ApiGatewayApp\.java" checks="HideUtilityClassConstructor"/>
+    <suppress files=".*AuthServiceApp\.java" checks="HideUtilityClassConstructor"/>
+    <suppress files=".*InventoryServiceApp\.java" checks="HideUtilityClassConstructor"/>
+    <suppress files=".*NotificationServiceApp\.java" checks="HideUtilityClassConstructor"/>
+    <suppress files=".*OrderServiceApp\.java" checks="HideUtilityClassConstructor"/>
+    <suppress files=".*ProductServiceApp\.java" checks="HideUtilityClassConstructor"/>
+    <suppress files=".*UserServiceApp\.java" checks="HideUtilityClassConstructor"/>
+    <!-- <suppress files="src/main/java/ru/dyatchin/gateway/ApiGatewayApp.java"
+              checks="HideUtilityClassConstructor"/> -->
+</suppressions>

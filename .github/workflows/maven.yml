@@ -64,7 +64,12 @@ jobs:
       - name: Extract module names
         id: modules
         run: |
-          MODULES=$(find . -name "pom.xml" -exec dirname {} \; | grep -v "/target" | sort | tr '\n' ',' | sed 's/,$//')
+          MODULES=$(find . -name "pom.xml" -exec dirname {} \; | \
+          grep -v "/target" | \
+          sed 's|^\./||' |  # Удаляем префикс ./
+          sort | \
+          tr '\n' ',' | \
+          sed 's/,$//')
           echo "modules=$MODULES" >> "$GITHUB_OUTPUT"
 
       - name: Build and push each module

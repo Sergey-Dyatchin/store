@@ -1,6 +1,6 @@
 /**
  * Пакет Inventory-service: запускающий класс.
  */
-package ru.dyatchin;
+package ru.dyatchin.inventory;
 
 

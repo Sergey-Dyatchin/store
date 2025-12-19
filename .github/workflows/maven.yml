@@ -29,8 +29,6 @@ jobs:
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-m2-
 
     - name: Run Checkstyle
       run: mvn -B checkstyle:check
@@ -38,3 +36,5 @@ jobs:
     - name: Run tests and generate JaCoCo report
       run: mvn -B -DskipTests=false test jacoco:report
 
+    - name: Run tests with coverage >= 80%
+      run: mvn test jacoco:check

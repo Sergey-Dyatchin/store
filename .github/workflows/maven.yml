@@ -33,8 +33,5 @@ jobs:
     - name: Run Checkstyle
       run: mvn -B checkstyle:check
 
-    - name: Run tests and generate JaCoCo report
-      run: mvn -B -DskipTests=false test jacoco:report
-
-    - name: Run tests with coverage >= 80%
-      run: mvn test jacoco:check
+    - name: Run tests + Coverage Check (80% minimum)
+      run: mvn clean verify

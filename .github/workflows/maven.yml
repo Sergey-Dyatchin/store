@@ -85,15 +85,37 @@ jobs:
             exit 1
           fi
 
+
       - name: Build and push module (${{ matrix.module }})
         env:
           MODULE_DIR: ${{ matrix.module }}
           IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/${{ matrix.module }}
         shell: bash
         run: |
+          # 1. Отладка: выводим все переменные
+          echo "🔍 Debug info:"
+          echo "  MODULE_DIR: '$MODULE_DIR'"
+          echo "  IMAGE_NAME: '$IMAGE_NAME'"
+          echo "  Current path: $(pwd)"
 
-          echo "➡️ Building and pushing $IMAGE_NAME..."
+          # 2. Проверяем существование директории
+          if [ ! -d "$MODULE_DIR" ]; then
+            echo "❌ ERROR: Directory '$MODULE_DIR' does not exist!"
+            exit 1
+          fi
 
+          # 3. Проверяем Dockerfile
+          if [ ! -f "$MODULE_DIR/Dockerfile" ]; then
+            echo "❌ ERROR: Dockerfile not found at '$MODULE_DIR/Dockerfile'"
+            exit 1
+          fi
+
+          # 4. Выводим содержимое директории (для уверенности)
+          echo "Contents of $MODULE_DIR:"
+          ls -la "$MODULE_DIR"
+
+          # 5. Запуск сборки с явными путями
+          echo "➡️ Building image: $IMAGE_NAME"
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --tag "$IMAGE_NAME:latest" \
@@ -102,4 +124,4 @@ jobs:
             --push true \
             "$MODULE_DIR"
 
-          echo "✅ Pushed $IMAGE_NAME:latest and $IMAGE_NAME:${{ github.sha }}"
+          echo "✅ Success: Pushed $IMAGE_NAME:latest and $IMAGE_NAME:${{ github.sha }}"

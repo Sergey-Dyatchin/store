@@ -74,6 +74,9 @@ jobs:
 
       - name: Build and push each module
         run: |
+          # Разделяем строку с модулями на массив
+          IFS=',' read -ra MODULE_DIRS <<< <(echo "${{ steps.modules.outputs.modules }}")
+
           for MODULE_DIR in ${{ steps.modules.outputs.modules }}; do
             MODULE_NAME=$(basename "$MODULE_DIR")
             IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/$MODULE_NAME

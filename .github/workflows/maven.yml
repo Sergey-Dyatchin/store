@@ -8,7 +8,6 @@ on:
 
 env:
   JAVA_VERSION: '17'
-  MODULES: "api-gateway,auth-service,inventory-service,notification-service,order-service,product-service,user-service"
 
 jobs:
   build-and-test:
@@ -41,6 +40,11 @@ jobs:
     name: Docker build and push
     needs: build-and-test
     runs-on: ubuntu-latest
+    # Определяем матрицу: один параметр — модуль
+    strategy:
+      matrix:
+        module: [api-gateway, auth-service, inventory-service, notification-service, order-service, product-service, user-service]
+      fail-fast: false  # Продолжать, даже если один модуль провалился
 
     steps:
       - name: Checkout
@@ -62,34 +66,21 @@ jobs:
             username: ${{ secrets.DOCKER_USERNAME }}
             password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push each module
+      - name: Build and push module (${{ matrix.module }})
         run: |
-            # Разбиваем список модулей на массив
-            IFS=',' read -r -a MODULE_DIRS <<< <(echo "${{ env.MODULES }}")
+          MODULE_DIR="${{ matrix.module }}"
+          MODULE_NAME="${{ matrix.module }}"
+          IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/$MODULE_NAME
 
-            for MODULE_DIR in "${MODULE_DIRS[@]}"; do
-              # Проверяем существование директории
-              if [ ! -d "$MODULE_DIR" ]; then
-                echo "❌ Directory not found: $MODULE_DIR"
-                continue
-              fi
+          echo "➡️ Building and pushing $IMAGE_NAME..."
 
-              # Получаем имя модуля (последняя часть пути)
-              MODULE_NAME=$(basename "$MODULE_DIR")
-              # Формируем полное имя образа
-              IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/$MODULE_NAME
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            --tag "$IMAGE_NAME:latest" \
+            --tag "$IMAGE_NAME:${{ github.sha }}" \
+            --file "$MODULE_DIR/Dockerfile" \
+            --push true \
+            "$MODULE_DIR"
 
-              echo "➡️ Building and pushing $IMAGE_NAME..."
-
-              # Собираем и загружаем Docker-образ
-              docker buildx build \
-                --platform linux/amd64,linux/arm64 \
-                --tag "$IMAGE_NAME:latest" \
-                --tag "$IMAGE_NAME:${{ github.sha }}" \
-                --file "$MODULE_DIR/Dockerfile" \
-                --push true \
-                "$MODULE_DIR"
-
-              echo "✅ Pushed $IMAGE_NAME:latest and $IMAGE_NAME:${{ github.sha }}"
-            done
+          echo "✅ Pushed $IMAGE_NAME:latest and $IMAGE_NAME:${{ github.sha }}"
 

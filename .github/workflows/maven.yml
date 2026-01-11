@@ -88,9 +88,9 @@ jobs:
       - name: Build and push module (${{ matrix.module }})
         env:
           MODULE_DIR: ${{ matrix.module }}
-          MODULE_NAME: ${{ matrix.module }}
+          IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/${{ matrix.module }}
+        shell: bash
         run: |
-          IMAGE_NAME="$DOCKER_USERNAME/$MODULE_NAME"
 
           echo "➡️ Building and pushing $IMAGE_NAME..."
 

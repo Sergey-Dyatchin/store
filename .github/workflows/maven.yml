@@ -64,12 +64,12 @@ jobs:
       - name: Extract module names
         id: modules
         run: |
-          MODULES=$(find . -name "pom.xml" -exec dirname {} \; | \
-          grep -v "/target" | \
-          sed 's|^\./||' |  # Удаляем префикс ./
-          sort | \
-          tr '\n' ',' | \
-          sed 's/,$//')
+          MODULES=$(find . -path "./*/pom.xml" -exec dirname {} \; | \
+            grep -v "/target" | \
+            sed 's|^\./||' | \
+            sort | \
+            tr '\n' ',' | \
+            sed 's/,$//')
           echo "modules=$MODULES" >> "$GITHUB_OUTPUT"
 
       - name: Build and push each module
@@ -78,7 +78,7 @@ jobs:
             MODULE_NAME=$(basename "$MODULE_DIR")
             IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/$MODULE_NAME
 
-            echo "➡️ Building and pushing $IMAGE_NAME..."
+            echo "Building and pushing $IMAGE_NAME..."
 
             # Собираем и загружаем образ
             docker buildx build \
@@ -89,5 +89,5 @@ jobs:
               --push true \
               "$MODULE_DIR"
 
-            echo "✅ Pushed $IMAGE_NAME:latest and $IMAGE_NAME:${{ github.sha }}"
+            echo "Pushed $IMAGE_NAME:latest and $IMAGE_NAME:${{ github.sha }}"
           done

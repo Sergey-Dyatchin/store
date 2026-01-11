@@ -72,6 +72,24 @@ jobs:
           MODULE_NAME="${{ matrix.module }}"
           IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/$MODULE_NAME
 
+          # Диагностика
+          echo "🔍 Module directory: ./$MODULE_DIR"
+          echo "🔍 Image name: $IMAGE_NAME"
+
+          # Проверка директории
+          if [ ! -d "$MODULE_DIR" ]; then
+            echo "❌ Directory not found: ./$MODULE_DIR"
+            ls -la
+            exit 1
+          fi
+
+          # Проверка Dockerfile
+          if [ ! -f "$MODULE_DIR/Dockerfile" ]; then
+            echo "❌ Dockerfile missing in ./$MODULE_DIR"
+            ls -la "$MODULE_DIR"
+            exit 1
+          fi
+
           echo "➡️ Building and pushing $IMAGE_NAME..."
 
           docker buildx build \
